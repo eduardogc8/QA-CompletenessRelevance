@@ -40,11 +40,6 @@ Scores range from 0 to 100, reflecting how focused and pertinent the answer is t
 
 See the paper (section [Dataset Construction](#)) for a detailed analysis of the annotation process and agreement metrics.
 
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE), which allows free, open-source distribution and reuse.
 
 ---
 
