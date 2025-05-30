@@ -47,7 +47,6 @@ See the paper (section [Dataset Construction](#)) for a detailed analysis of the
 
 If you use this dataset in your research or application, please cite:
 
-> **LongAnswerQA-Metrics: A Dataset for Evaluating Completeness and Relevance in Long Answers**  
 > *[Will be made available.]*
 
 ---
