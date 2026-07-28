@@ -1,9 +1,47 @@
+---
+license: mit
+language:
+  - en
+pretty_name: QA-CompletenessRelevance
+size_categories:
+  - n<1K
+task_categories:
+  - question-answering
+annotations_creators:
+  - expert-generated
+language_creators:
+  - found
+  - machine-generated
+source_datasets:
+  - extended|eli5
+tags:
+  - evaluation
+  - meta-evaluation
+  - evaluation-metrics
+  - long-form-qa
+  - non-factoid-qa
+  - completeness
+  - relevance
+  - llm-as-a-judge
+  - human-annotation
+  - computer-science
+configs:
+  - config_name: answers
+    default: true
+    data_files:
+      - split: test
+        path: data/answers.parquet
+  - config_name: pairs
+    data_files:
+      - split: test
+        path: data/pairs.parquet
+---
+
 # QA-CompletenessRelevance
 
 **How complete is an answer? How relevant is it? This dataset has human answers to both.**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow)](https://huggingface.co/datasets/egcortes/qa-completeness-relevance)
+[![GitHub](https://img.shields.io/badge/GitHub-QA--CompletenessRelevance-black)](https://github.com/eduardogc8/QA-CompletenessRelevance)
 [![Model](https://img.shields.io/badge/%F0%9F%A4%97%20Model-qa--completeness--regressor-yellow)](https://huggingface.co/egcortes/qa-completeness-regressor)
 [![Paper](https://img.shields.io/badge/Paper-Lang%20Resources%20%26%20Evaluation-blue)](https://doi.org/10.1007/s10579-026-09936-6)
 
@@ -32,24 +70,19 @@ data = load_dataset("egcortes/qa-completeness-relevance")["test"]
 print(data[0]["question"], data[0]["completeness"], data[0]["relevance"])
 ```
 
-Or straight from here, with no Hugging Face account:
-
-```python
-import pandas as pd
-
-url = "https://raw.githubusercontent.com/eduardogc8/QA-CompletenessRelevance/main/data/answers.csv"
-answers = pd.read_csv(url)
-```
+CSV and JSON versions, and the script that builds them, are on
+[GitHub](https://github.com/eduardogc8/QA-CompletenessRelevance).
 
 ---
 
 ## Dataset
 
-| File | Rows | What it is |
+Two configurations, one `test` split each. This is an evaluation set, so there is no training split.
+
+| Config | Rows | What it is |
 |---|---|---|
-| `data/answers.csv` / `.parquet` | 212 | One row per scored answer. **Start here.** |
-| `data/pairs.csv` / `.parquet` | 106 | One row per question, both answers side by side. |
-| `data/final_dataset.json` | 106 | The original nested file, exactly as used in the paper. |
+| `answers` (default) | 212 | One row per scored answer. **Start here.** |
+| `pairs` | 106 | One row per question, both answers side by side. |
 
 Columns in `answers`:
 
@@ -63,13 +96,13 @@ Columns in `answers`:
 | `relevance` | float | 0 to 100, average of 4 annotators |
 | `reference_answer` | string | Expert answer for this question. Not scored itself. |
 
+Columns in `pairs`: `question_id`, `question`, `reference_answer`, `human_answer`,
+`human_completeness`, `human_relevance`, `gpt4_answer`, `gpt4_completeness`, `gpt4_relevance`.
+
 **Completeness**: does the answer cover everything the question asks for?
 **Relevance**: is everything in the answer about what was asked?
 
 The two scores only correlate at **r = 0.41**, so they really do measure different things.
-
-`data/final_dataset.json` is the source file. The other files are generated from it by
-`python build_dataset.py`.
 
 The human answers are Reddit comments from r/explainlikeimfive, taken from the
 [ELI5 dataset](https://huggingface.co/datasets/defunct-datasets/eli5) (Fan et al., 2019), and belong
@@ -104,10 +137,10 @@ the paper's Gemini Flash scores reproduces its published numbers exactly (Spearm
 accuracy 85.85%).
 
 ```python
-import pandas as pd
+from datasets import load_dataset
 from scipy.stats import spearmanr
 
-answers = pd.read_csv("data/answers.csv")
+answers = load_dataset("egcortes/qa-completeness-relevance")["test"].to_pandas()
 answers["my_score"] = [my_metric(q, a) for q, a in zip(answers.question, answers.answer)]
 
 # 1. Correlation with the human scores, across all 212 answers.

@@ -1,0 +1,7 @@
+# Keep line endings identical on every platform, so that running
+# `python build_dataset.py` reproduces byte-for-byte what is committed here.
+* text=auto eol=lf
+
+*.parquet binary
+*.zip     binary
+*.png     binary
